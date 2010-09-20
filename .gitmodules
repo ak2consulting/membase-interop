@@ -1,0 +1,3 @@
+[submodule "EnyimMemcached"]
+	path = EnyimMemcached
+	url = git@github.com:enyim/EnyimMemcached.git
