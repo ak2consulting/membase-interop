@@ -9,6 +9,7 @@ using Enyim.Caching.Memcached;
 using System.Web.Configuration;
 using System.Configuration;
 using System.IO;
+using Enyim;
 
 namespace NorthScale.Store.Interop
 {
@@ -16,6 +17,8 @@ namespace NorthScale.Store.Interop
 	[ProgId("NorthScale.Store.Interop.NorthScaleClientFactory")]
 	public class NorthScaleClientWrapperFactory : INorthScaleClientWrapperFactory
 	{
+		private static Dictionary<string, INorthScaleClientWrapper> cache = new Dictionary<string, INorthScaleClientWrapper>(StringComparer.OrdinalIgnoreCase);
+
 		INorthScaleClientWrapper INorthScaleClientWrapperFactory.Create(string configPath)
 		{
 			return ((INorthScaleClientWrapperFactory)this).CreateWithBucket(configPath, null);
@@ -23,9 +26,19 @@ namespace NorthScale.Store.Interop
 
 		INorthScaleClientWrapper INorthScaleClientWrapperFactory.CreateWithBucket(string configPath, string bucketName)
 		{
-			var config = this.Load(configPath, null);
+			var key = configPath + "++" + bucketName;
+			INorthScaleClientWrapper retval;
 
-			return new NorthScaleClientWrapper(config, bucketName);
+			if (!cache.TryGetValue(key, out retval))
+				lock (cache)
+					if (!cache.TryGetValue(key, out retval))
+					{
+						var config = this.Load(configPath, null);
+
+						cache[key] = retval = new NorthScaleClientWrapper(config, bucketName);
+					}
+
+			return retval;
 		}
 
 		private INorthScaleClientConfiguration Load(string path, string sectionName)
