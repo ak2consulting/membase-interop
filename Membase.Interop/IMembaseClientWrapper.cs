@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NorthScale.Store;
-using NorthScale.Store.Configuration;
+using Membase;
+using Membase.Configuration;
 using System.Runtime.InteropServices;
 
-namespace NorthScale.Store.Interop
+namespace Membase.Interop
 {
 	[Guid("2a839618-797d-4715-9337-6c349706034a"), InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
-	public interface INorthScaleClientWrapper
+	public interface IMembaseClientWrapper
 	{
 		object Get(string key);
 
